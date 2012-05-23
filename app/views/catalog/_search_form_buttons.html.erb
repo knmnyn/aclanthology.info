@@ -1,0 +1,51 @@
+<script type="text/javascript">
+
+function submitFunction(i) {
+  if (i==2) { 
+    var parent = document.getElementById('searchbox');
+    var text = document.getElementById('q').value;
+    text = text.replace(/\$/,"xxDOLLARxx");
+    text = text.replace(/\~/,"$_");
+    text = text.replace(/\*/,"$.");
+    text = text.replace(/xxDOLLARxx/,"$$");
+    document.getElementById('q').disabled = true;
+    document.getElementById('submit.sb').disabled = true;
+    if (text === "") {
+      document.theForm.action="http://aclasb.dfki.de/";
+    } else {
+      document.theForm.action="http://aclasb.dfki.de/#keyw~" + text + "*";
+    }
+  }
+  if (i==3) { 
+    var parent = document.getElementById('searchbox');
+    var text = document.getElementById('q').value;
+    parent.removeChild(document.getElementById('search.g1'));
+    parent.removeChild(document.getElementById('search.g2'));
+    document.getElementById('q').disabled = true;
+    document.getElementById('submit.aan').disabled = true;
+    if (text === "") {
+      document.theForm.action="http://clair.si.umich.edu/clair/anthology/";
+    } else {
+      parent.innerHTML += "<input name='query' type='hidden' value='" + text + "'/><br />";
+      document.theForm.action="http://clair.si.umich.edu/clair/anthology/search.cgi";
+    }
+  }
+  document.theForm.submit()
+}
+</script>
+
+<div id="search" class="search">
+  <%= form_tag catalog_index_path,:name=>"theForm",:id=>"searchbox", :method => :get do %>
+    <h2 class="search"><%= label_tag(:q, "search ") %></h2>
+    <%= text_field_tag :q, params[:q], :class => "q" %>
+    <%= label_tag(:search_field, " in ") %>
+    <%= select_tag(:search_field, options_for_select(search_fields, h(params[:search_field])), :title => "Targeted search options", :class=>"search_field") %>
+    
+    <%= search_as_hidden_fields(:omit_keys => [:q, :search_field, :qt, :page]).html_safe %>        
+    
+    <%= submit_tag 'Search', :class=>'search' %>
+    <%= submit_tag 'via AAN', :id=>"submit.aan", :onClick=>"submitFunction(2)"%>
+    <%= submit_tag 'via SearchBench',:id=>"submit.sb", :onClick=>"submitFunction(3)"%>
+  <% end %>
+  <%= link_to 'Advanced search', params.merge(:controller=>"advanced", :action=>"index") , :class=>"advanced_search", :title=>"For more advanced search options"%> 
+</div>

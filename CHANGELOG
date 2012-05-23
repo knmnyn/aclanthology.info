@@ -1,0 +1,5 @@
+- config/initializers/blacklight_config.rb deprecated, changes to CatalogController
+
+- blacklight is not a plugin but a gem. No 'vendor/plugins/blackight' directory.
+
+- new helper function render_facet_partails used in _facets.html.erb

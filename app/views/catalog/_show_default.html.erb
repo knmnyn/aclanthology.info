@@ -1,0 +1,100 @@
+<%# default partial to display solr document fields in catalog show view -%>
+<dl class="defList">
+  <% document_show_fields.each do |solr_fname| %>
+    <% if document.has? solr_fname %>
+      <% if not document.get(solr_fname) == "not available"%>
+        <% if solr_fname == "pdflink"%>
+          <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+          <dd class="blacklight-<%= solr_fname.parameterize %>"><%= link_to image_tag('pdf_icon.png',:size=>"24x24"),document.get(solr_fname) %></dd>
+        <%elsif solr_fname == 'author'%>
+            <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+            <dd class="blacklight-<%= solr_fname.parameterize %>"><% authors=render_author_index_field_value :document => document, :field => solr_fname %>
+              <%authors.each do |auth|%>
+                <%=link_to auth,url_for(:controller=>"people",:action=>"index",:author=>auth)%>
+                  <%if authors.index(auth) != authors.size-1%>
+                      ;
+                    <%end%>
+                <%end%>
+            </dd>
+        <% elsif solr_fname == "volumeinfo" %>
+          <% if document.get("type") == "InProceedings" %>
+            <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+            <dd class="blacklight-<%= solr_fname.parameterize %>"><%= link_to document.get(solr_fname),catalog_path(document.get("volumeid")) %></dd>
+          <% end %>         
+        <% elsif solr_fname == "software" or solr_fname == "dataset" or solr_fname=="attachment"%>
+          <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+          <dd class="blacklight-<%= solr_fname.parameterize %>"><%= link_to solr_fname,document.get(solr_fname) %></dd>
+          <% elsif solr_fname == "bibformat"%>
+
+            <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+            <dd class="blacklight-<%= solr_fname.parameterize %>">    
+          
+              <script type="text/javascript" src="jquery.js"></script>
+              <form>
+                <div>
+                <input type="radio" name="format" value="bib" id="bib"><label for="bib"> Bib &nbsp</label> 
+                <input type="radio" name="format" value="ris" id="ris"><label for="ris"> Ris &nbsp</label>
+                <input type="radio" name="format" value="endn" id="endn"><label for="endn"> EndNote &nbsp</label>
+                <input type="radio" name="format" value="word" id="word"><label for="word"> Word &nbsp</label>
+              </div>
+              <!--div><input type="radio" name="format" value="xyz" id="xyz"><label for="xyz">xyz</label></div-->
+            </form>
+            <div id="bib1" style="display: none "><%= document.get("bibformat").gsub(/\n/, '<br>').html_safe%></div>
+            <div id="ris1" style="display: none"><%= document.get("risformat").gsub(/\n/, '<br/>').html_safe%></div>
+            <div id="end1" style="display: none"><%= document.get("endformat").gsub(/\n/, '<br/>').html_safe%></div>
+            <div id="word1" style="display: none"><%=h document.get("wordformat").gsub(/\n/, '<br/>')%></div>
+            <!--div id="xyz1" style="display: none"--><!--%=document.get("xyzformat")%></div-->
+
+            <script>
+              $("input").click(function() {
+                if ($(":checked").val()=="bib") {
+                  $("#bib1").css("display", "block");
+                  $("#bib1").css("margin-left", "30%");
+                  $("#ris1").css("display", "none");
+                  $("#end1").css("display", "none");
+                  $("#word1").css("display", "none");
+                  //$("#xyz1").css("display", "none");
+                }
+                else if ($(":checked").val()=="ris") {
+                  $("#bib1").css("display", "none");
+                  $("#ris1").css("display", "block");
+                  $("#ris1").css("margin-left", "30%");
+                  $("#end1").css("display", "none");
+                  $("#word1").css("display", "none");
+  
+                }
+                else if ($(":checked").val()=="endn") {
+                  $("#bib1").css("display", "none");
+                  $("#ris1").css("display", "none");
+                  $("#end1").css("display", "block");
+                  $("#end1").css("margin-left", "30%");
+                  $("#word1").css("display", "none");
+  
+                }
+                else {
+                  $("#bib1").css("display", "none");
+                  $("#ris1").css("display", "none");
+                  $("#end1").css("display", "none");
+                  $("#word1").css("display", "block");
+                  $("#word1").css("margin-left", "30%");
+               }
+            });
+            </script>
+          </dd>          
+        <% else %>
+          <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label :field => solr_fname %>
+          <dd class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_value :document => document, :field => solr_fname %></dd>
+        <% end %>
+      <% end %>
+    <% end -%>
+  <% end -%>
+  <dt class="blacklight-erratum">Erratum:
+  <dd class="blacklight-erratum">
+    <% if document.get("id") == "P11-1063" %>
+      <%= link_to image_tag('pdf_icon.png',:size=>"24x24"),"http://www.aclweb.org/anthology/P/P11/P11-1063e1.pdf" %>
+    <%else%>
+      None
+    <%end%>
+  </dd>
+
+</dl>

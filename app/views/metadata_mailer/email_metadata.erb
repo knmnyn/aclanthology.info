@@ -1,0 +1,8 @@
+<%= 
+
+"Someone has reported bugs in the record #{@metadata["id"]}"  
+%>
+<br> <br>
+
+<%= @metadata["Bug Report"].gsub(/\n/, '<br>').html_safe %>
+<br>

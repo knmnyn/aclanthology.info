@@ -1,0 +1,9 @@
+
+- The XML will have one entry per each paper. 
+- The attribute id corresponds to the 'Anthology id' of the particular paper.
+- The attribute 'type' in the 'content' element informs the type of information. The display style of information varies depending upon its type.
+    * text     - textual information is displayed in a plain text box. Ex: keywords, abstract, concepts.
+    * webpage  - the external link displayed in an iframe of 800px * 800 px . Ex: references to corresponding pages in external service. For example bibliometric information from AAN.
+    * resource - a href link to the resource specified by the user. Ex: rich text format, parse trees
+- The attribute 'name' specifies the prefered name to the contributed information
+

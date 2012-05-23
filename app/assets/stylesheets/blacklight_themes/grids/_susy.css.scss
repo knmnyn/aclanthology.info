@@ -1,0 +1,76 @@
+
+/* Grid parameters */
+/* changing total cols is not recommended unless you're going to redo blacklight/_layout.css.sass */
+$total-cols: 24 !default;
+
+/* But the widths are changeable to px, em. */
+$col-width: 2.5em !default;
+$gutter-width: .5em !default;
+$side-gutter-width: 2em !default;
+
+@import "blacklight/grids/susy_framework";
+@import "compass/utilities";
+
+/* Header Container Layout */
+#page 
+{ 
+  @include container;
+  background: #fff asset_url('blacklight/border.jpg',image) repeat-x top left; border-bottom: 2px solid #555; margin: auto;
+  width:90%;
+  max-width:90%;
+  min-width:1024px;
+  overflow-x:auto; 
+}
+
+#hd 
+{
+  @include full;
+  @include clearfix;
+  padding: 1em 2em 1em 0;
+  height: 100px;
+
+  #logo 
+  {
+    @include columns(12,24);
+    height:90px;
+  }
+  #user_util_links 
+  { 
+    text-align: right;
+    color: grey;
+    @include columns(12,24);
+    @include omega(24);
+  }
+}
+
+#bd 
+{
+  @include full;
+  @include clearfix;
+  #main 
+  {
+    @include prefix(1,24);
+    @include columns(18,24);
+    @include omega(24);
+    position: relative;
+  }
+
+  #sidebar 
+  {
+    @include columns(5,24);
+    @include clearfix;
+    
+    p 
+    { 
+      padding-top: 2em;
+    }
+    position:relative;
+  }
+}
+
+#ft {
+  @include full;
+  @include clearfix;
+}
+
+

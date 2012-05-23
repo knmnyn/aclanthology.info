@@ -1,0 +1,21 @@
+<%# default partial to display solr document fields in catalog index view -%>
+<!--<dl class="defList">-->
+  
+<% index_field_names.each do |solr_fname| -%>
+  <% if document.has? solr_fname %>
+    <% if solr_fname == "pdflink"%>
+      <%= link_to image_tag("pdf_icon_small.gif"), document.get(solr_fname) %>
+    
+      <% else %>
+        <b><%= '['+document[:id]+']:' %></b> 
+        <% authors=render_author_index_field_value :document => document, :field => solr_fname %>
+        <%authors.each do |auth|%>
+          <%=link_to auth,url_for(:controller=>"people",:action=>"index",:author=>auth)%>
+          <%if authors.index(auth) != authors.size-1%>
+            ;
+          <%end%>
+      <%end %>
+    <% end %>
+  <% end -%>
+<% end -%>
+

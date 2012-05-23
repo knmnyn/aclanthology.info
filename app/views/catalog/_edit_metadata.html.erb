@@ -1,0 +1,36 @@
+<% 
+#txt = "Please provide your details below and fill in the details of incorrect meta-data. The editors will get back to you shortly. \n \n"
+txt ="Please provide your contact details and fill in the details of the necessary changes below.  To prevent unauthorized changes, the editors review such requests manually, and will get back to you if the change is approved and reflected in the Anthology. \n\n"
+ 
+txt << "Your Name: \n"
+txt << "Your Email: \n"
+txt << "--------------------\n"
+document_show_fields.each do |solr_fname|
+  if solr_fname == 'dataset' or solr_fname == 'software'
+    next
+  else
+  txt << blacklight_config.show_fields[solr_fname].label + "\n"
+  end
+  #txt << Blacklight.config[:show_fields][:labels][solr_fname] +"\n"
+end
+txt << "Dataset*: \n"
+txt << "Software*: \n"
+txt << "Erratum*: \n"
+txt << "Revised Version*: \n\n"
+txt << "* = please use a URL that is accessible for at least 1 week to provide this information.\n"
+txt << "N.B.: This form is for correcting or adding author provided information to an individual paper.  If you want to programmatically contribute additional information to a set of papers (e.g., automated processing output of the Anthology data, please see the 'Contributed Information' link below this form.\n"
+%>
+
+
+<%= form_tag 'send_metadata_email' do %>
+    <%= text_area_tag 'meta[Bug Report]', txt %>
+    <%= hidden_field_tag 'meta[id]', @document.get('id') %>
+    <%= hidden_field_tag 'id', @document.get('id') %>
+    <br />
+    <%= submit_tag "Send to editor" %>
+    <br /><br />
+  <% end %>
+
+<% #meta_data['Bug Report']= txt %>
+<%# = link_to "send_email", url_for( :controller=>'catalog', :action=>'send_metadata_email', :id=>@document.id ,:metadata=>metadata) %>
+

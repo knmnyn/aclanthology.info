@@ -1,0 +1,69 @@
+<% @page_title = "#{application_name} Author : #{@author}'s Page"%>
+<h1><%=@author%></h1>
+<%author_name=@author%>
+<%author_name = " "+author_name if not author_name.start_with?(" ")%>
+<%author_name = author_name+" " if not author_name.end_with?(" ")%>
+
+<h3><i> Publications</i> </h3>
+<%years=[]%>
+<%@year_facets.items.each do |item|%>
+  <%years.push item.value%>
+<%end%>
+<%years=years.sort.reverse%>
+
+
+<%documents_sort={}%>
+
+<% @documents.each do |document| %>
+  <% if documents_sort.has_key? document.get("year") %>
+    <%documents_sort[document.get("year")].push  document%>
+  <%else%>
+    <% documents_sort[document.get("year")]= [] %>
+    <% documents_sort[document.get("year")].push document%>
+  <%end%>
+<%end%>
+
+<%years.each do |year| %>
+  <b><%=year if documents_sort.key? year%></b><br>
+  <%documents_year = []%>
+  <% documents_year=documents_sort[year] if documents_sort.key? year %>
+  <ul>
+  <% documents_year.each do |document| %>
+  <li><%= link_to image_tag('pdf_icon.png',:size=>"24x24"),document.get("pdflink")%> <%= link_to document[:title],catalog_path(:id=>document[:id]) %> </li>
+  <%end%>
+  </ul>
+
+
+<%end%>
+<%coauthor_limit =10%>
+<% sidebar_items << "<br><br><br>" %>
+<% sidebar_items << "<h3> <i>Popular Co-Authors</i> </h3>" %>
+<%@author_facets.items.each_with_index do |co_author,index|%>
+  <%if index < coauthor_limit and index >0%>
+    <%sidebar_items << capture do %>
+      <%= (link_to co_author.value,url_for(:controller=>"people",:action=>"index",:author=>co_author.value)) +render_facet_count(co_author.hits)%><br>
+    <%end%>
+  <%end%>
+<% end%>
+
+
+<% sidebar_items << "<br><br>" %>
+
+<% sidebar_items << "<h3> <i>Venue</i> </h3>" %>
+<%@venue_facets.items.each do |venue|%>
+  <%facet_params ||= {} %>
+  <%facet_params["venue"] ||= [] %>
+  <%facet_params["venue"].push(venue.value) %>
+  <%facet_params["author_facet"] ||= [] %>
+  <%facet_params["author_facet"].push(author_name.to_s) %>
+  <%sidebar_items << capture do %>
+  <%= (link_to venue.value,url_for(:controller=>"catalog",:f=>facet_params)) +render_facet_count(venue.hits) %> <br>
+  <%end%>
+<% end%>
+
+
+
+<% sidebar_items << "<br><br>" %>
+
+<% sidebar_items << "<h4>"+(link_to "Start Over",catalog_index_path)+"</h4>" %>
+

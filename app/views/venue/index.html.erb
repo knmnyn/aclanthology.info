@@ -1,0 +1,19 @@
+<% @page_title = "#{application_name} Venue : #{@venue.upcase} Page"%>
+<h1><%=get_venue_title @venue%></h1>
+<h3><i> Publications</i> </h3>
+<%author_limit =20%>
+<% sidebar_items << "<br><br><br>" %>
+<% sidebar_items << "<h3> <i>Popular Authors</i> </h3>" %>
+<% @popular_authors.items.each_with_index do |author,index| %>
+  <%if index < author_limit%>
+    <%sidebar_items << capture do %>
+      <%=(link_to author.value,url_for(:controller=>"people",:action=>"index",:author=>author.value))%> <%=render_facet_count(author.hits)%><br><br>
+    <%end%>
+  <%end %>
+<%end %>
+<ul>
+<%@documents_list.each do |document|%>
+  <li><%=link_to image_tag('pdf_icon_small.gif'),document.get("pdflink")%><%= '['+document[:id]+']:' %> <%= link_to document[:title],catalog_path(:id=>document[:id]) %></li><br>
+<%end%>
+</ul>
+<%= paginate_rsolr_response @response%>

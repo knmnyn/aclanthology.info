@@ -1,0 +1,43 @@
+/*
+ * Required by Blacklight:
+ *= require 'jquery/ui-lightness/jquery-ui-1.8.1.custom.css'
+ *
+ * This is the default theme. You can modify many of the settings 
+ * by editing your local app/assets/stylesheets/blacklight_themes/standard.css
+ *= require 'blacklight_themes/standard'         
+ *
+ * This is a manifest file that'll automatically include all the stylesheets available in this directory
+ * and any sub-directories. You're free to add application-wide styles to this file and they'll appear at
+ * the top of the compiled file, but it's generally better to create a new file per style scope.
+ *= require_self
+ *= require_tree . 
+
+ *= require 'blacklight_advanced_search'
+
+
+ *
+ * Used by blacklight_range_limit
+ *= require  'blacklight_range_limit'
+ *         
+*/
+.search .advanced_search {
+      background-color: #EEEEEE;
+      font-size: 85%;
+      left: 10px;
+      position: relative;
+      top: 7px;
+}
+h1.site_title a
+{
+   
+    border:0;
+    display:block;
+    height:90px;
+    overflow:hidden;
+    text-decoration:none;
+    text-indent:0px;
+    width:300px;
+  
+}
+
+
