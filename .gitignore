@@ -3,3 +3,5 @@ db/*.sqlite3
 log/*.log
 tmp/
 .sass-cache/
+anthology_solr_dump
+anthology_solr_vol_dump
