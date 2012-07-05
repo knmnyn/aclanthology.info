@@ -1,4 +1,6 @@
 namespace :anthology do
+
+  desc "Resets the database (and solr indices if local)"
   task :reset => :environment do
    # puts "Stopping Solr..."
    # Rake::Task['anthology:solr:stop_jetty'].invoke
