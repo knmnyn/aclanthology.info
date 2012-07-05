@@ -15,12 +15,12 @@
 # limitations under the License.
 
 FILES=$*
-URL=http://localhost:4001/solr/update
-#URL=http://137.132.82.16:4001/solr/update
+URL=http://localhost:8983/solr/update
+# URL=http://137.132.82.16:4001/solr/update
 
 for f in $FILES; do
   echo Posting file $f to $URL
-  curl $URL --data-binary @$f -H 'Content-type:text/xml; charset=utf-8' 
+  curl $URL --data-binary @$f -H 'Content-type:text/xml; charset=utf-8'
   echo
 done
 

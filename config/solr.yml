@@ -12,10 +12,11 @@
 
 development:
   #jetty_path: './jetty'
-  #url: http://127.0.0.1:8983/solr
- url: http://137.132.82.16:4001/solr
+  url: http://127.0.0.1:8983/solr
+  #url: http://137.132.82.16:4001/solr
 production:
-  url: http://137.132.82.16:4001/solr
+  url: http://127.0.0.1:8983/solr
+#  url: http://137.132.82.16:4001/solr
 test: &test
   url: http://127.0.0.1:8888/solr
 cucumber:

@@ -2,7 +2,7 @@ namespace :anthology do
   desc "Export papers from database into solr via xml file"
   task :export_to_solr => :environment do
     xml = REXML::Document.new "<?xml version='1.0'?>"
-    post_loc = "jetty/post.sh"
+    post_loc = "../jetty/post.sh"
     require 'tempfile'
     papers = Paper.find(:all)
     add = xml.add_element 'add'
@@ -10,7 +10,6 @@ namespace :anthology do
 
       doc = add.add_element 'doc'
       id = doc.add_element 'field'
-      type = doc.add_element 'field'
       year = doc.add_element 'field'
       title = doc.add_element 'field'
       venue = doc.add_element 'field'
@@ -29,7 +28,6 @@ namespace :anthology do
       wordformat = doc.add_element 'field'
 
       id.attributes["name"] = "id"
-      type.attributes["name"] = "type"
       title.attributes["name"] = "title"
       year.attributes["name"] = "year"
       venue.attributes["name"] = "venue"
@@ -106,7 +104,9 @@ namespace :anthology do
       end
 
 
-      type.text = "InProceedings" # TODO fix this
+      #type.text = "InProceedings" # TODO fix this
+      workshop_labels= get_workshop_labels
+
       case venuelabel
 		when "A"
 		 venue.text="ANLP"	
@@ -162,8 +162,13 @@ namespace :anthology do
 		when "X"
 		 venue.text="TIPSTER"
          event_type.text="Non ACL"
-		else
-		  venue.text="WORKSHOPS"
+        when "W"
+          volume_id = paper.anthology_id[0..-3]+"00"
+          if workshop_labels.has_key?(volume_id)
+    		  venue.text= workshop_labels[volume_id].downcase
+          else
+            venue.text = "Others"
+          end
          event_type.text="Non ACL"
      end
 
@@ -201,19 +206,15 @@ namespace :anthology do
         ris=`BiblioScript/bibutils_3.40/xml2ris BiblioScript/bibutils_3.40/mods.xml`
         endf =`BiblioScript/bibutils_3.40/xml2end BiblioScript/bibutils_3.40/mods.xml`
         word=`BiblioScript/bibutils_3.40/xml2wordbib BiblioScript/bibutils_3.40/mods.xml`
+        ris=validate_encoding(ris, :invalid => :replace, :replace => "")
+        endf=validate_encoding(endf, :invalid => :replace, :replace => "")
+        bib=validate_encoding(bib, :invalid => :replace, :replace => "")
+        word=validate_encoding(word, :invalid => :replace, :replace => "")
+
         bibformat.text = bib
         risformat.text = ris
         endformat.text = endf
         wordformat.text = word
-      #Generating BibTex using biblioscript
-        #file = File.new('BiblioScript/bib_text.txt','w')
-        #citation_text=citation_text+". ("+year.text+"). "+title.text+". in:"+volumeinfo.text+"."
-        #file.write citation_text.to_s
-        #file.close
-        #bib=`BiblioScript/biblio_script.sh -q BiblioScript/bib_text.txt BiblioScript/output-dir/`
-        #bib=bib.gsub(/&/,"&amp;").gsub(/"/,"&quot;").gsub(/'/,"&#39;").gsub(/</,'&lt;').gsub(/>/, '&gt;')
-        #biblink.text=' '
-      ########################################
     }
 
 
@@ -224,19 +225,35 @@ namespace :anthology do
     #file.rewind
     file.close
 
-    #puts `#{post_loc} #{file.path}`
+    puts `#{post_loc} #{file.path}`
     # ingest file
-    `#{post_loc} #{file.path}`
+    #`#{post_loc} #{file.path}`
     #file.unlink
   end
-def generate_modsxml paper_title,year,volume_title,authors
+
+  def get_workshop_labels 
+  
+  volume_mappings= {}
+  file = File.new('doc/workshop_categories.txt','r')
+  lines = file.readlines
+  lines.each do  |line|
+    parts= line.split(":")
+    acronym = parts[0]
+    volumes= parts[1].split(",")
+    volumes.each do |vol|
+      volume_mappings[vol.strip]= acronym
+    end
+  end
+  return volume_mappings
+ end
+
+ def generate_modsxml paper_title,year,volume_title,authors
       xml = REXML::Document.new "<?xml version='1.0'?>"
       mods=xml.add_element 'mods'
       mods.attributes["ID"]='d1ej'
       title_info = mods.add_element 'titleInfo'
       title_name = title_info.add_element 'title'
       title_name.text = paper_title
-#add author information
       authors.each { |author|
         name = mods.add_element 'name'
         name.attributes["type"]="personal"
@@ -270,9 +287,9 @@ def generate_modsxml paper_title,year,volume_title,authors
      volume_name.text = volume_title
 
     return xml.to_s
-end
+ end
 
-def generate_volume_modsxml paper_title,year,authors
+ def generate_volume_modsxml paper_title,year,authors
       xml = REXML::Document.new "<?xml version='1.0'?>"
       mods=xml.add_element 'mods'
       mods.attributes["ID"]='d1ej'
@@ -304,14 +321,15 @@ def generate_volume_modsxml paper_title,year,authors
      date_issued.text = year
      
     return xml.to_s
-end
+ end
 ##############################################################################################################################################
 
   desc "Export papers from database into solr via xml file"
   task :export_volume_to_solr => :environment do
     xml = REXML::Document.new "<?xml version='1.0'?>"
-    post_loc = "jetty/post.sh"
+    post_loc = "../jetty/post.sh"
     require 'tempfile'
+	#Volume.delete_all(:anthology_id => "W00-0700") #index again and remove this 
     volumes = Volume.find(:all)
 
     add = xml.add_element 'add'
@@ -365,7 +383,7 @@ end
       pdflink.text = acmurl+volume.anthology_id[0..0]+"/"+volume.anthology_id[0..2]+"/"+volume.anthology_id+".pdf"
       #biblink.text = acmurl+volume.anthology_id[0..0]+"/"+volume.anthology_id[0..2]+"/"+volume.anthology_id+".bib"
 
-
+      workshop_labels = get_workshop_labels
       case venuelabel
 		when "A"
 		 venue.text="ANLP"	
@@ -421,9 +439,15 @@ end
 		when "X"
 		 venue.text="TIPSTER"
          event_type.text="Non ACL"
-		else
-		  venue.text="WORKSHOPS"
+       when "W"
+         volume_id = volume.anthology_id
+         if workshop_labels.has_key?(volume_id)
+           venue.text= workshop_labels[volume_id].downcase
+         else
+           venue.text = "Others"
+         end
          event_type.text="Non ACL"
+
      end
 
       citation_text= ''
@@ -459,23 +483,43 @@ end
         ris=`BiblioScript/bibutils_3.40/xml2ris BiblioScript/bibutils_3.40/mods.xml`
         endf =`BiblioScript/bibutils_3.40/xml2end BiblioScript/bibutils_3.40/mods.xml`
         word=`BiblioScript/bibutils_3.40/xml2wordbib BiblioScript/bibutils_3.40/mods.xml`
+	ris=validate_encoding(ris, :invalid => :replace, :replace => "")
+        endf=validate_encoding(endf, :invalid => :replace, :replace => "")
+        bib=validate_encoding(bib, :invalid => :replace, :replace => "")
+        word=validate_encoding(word, :invalid => :replace, :replace => "")
+
         bibformat.text = bib
         risformat.text = ris
         endformat.text = endf
         wordformat.text = word
 
-    }
-
+   }	
     # write xml doc to temporary file
     file = File.new('anthology_solr_vol_dump','w')
     file.write xml.to_s
-    puts file.path
     #file.rewind
     file.close
 
-    #puts `#{post_loc} #{file.path}`
     # ingest file
-    `#{post_loc} #{file.path}`
+    puts `#{post_loc} #{file.path}`
     #file.unlink
   end
+
+  def validate_encoding(str, options = {})
+        str.chars.collect do |c|
+        if c.valid_encoding?
+        c
+        else
+        unless options[:invalid] == :replace
+        raise  Encoding::InvalidByteSequenceError.new
+        else
+        options[:replace] || (
+                        str.encoding.name.start_with?('UTF') ?
+                        "\uFFFD" :
+                        "?" )
+        end
+        end
+        end.join
+ end
+
 end # namespace :anthology

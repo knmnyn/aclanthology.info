@@ -177,12 +177,15 @@ desc "Loads papers from an xml files without <bibtype> and <bibtitle>"
     doc.elements.each("volume/paper") do |paper| 
       #Intution that volume titles end with "00" and doesn't have "author"
       if not paper.elements['author']
+	    vol_id =$volume_label+'-'+ paper.attributes["id"]
+        
         if paper.attributes["id"].end_with? "00"     
-        	@volume = Volume.new
-	        @volume.anthology_id =$volume_label+'-'+ paper.attributes["id"]
-
-          if not Volume.find_by_anthology_id @volume.anthology_id #for unique anthology_id check
+            #@volume = Volume.new
+	        #@volume.anthology_id =$volume_label+'-'+ paper.attributes["id"]
+          if not Volume.find_by_anthology_id vol_id #for unique anthology_id check
+            @volume = Volume.new
           	@volume.title = paper.elements['title'].text
+	        @volume.anthology_id =vol_id
   	        year= $volume_label.slice 1,2 
   	    	month="march"
 	    	if year.to_i > 50
@@ -194,7 +197,10 @@ desc "Loads papers from an xml files without <bibtype> and <bibtitle>"
 	        @volume.pubdate = DateTime.parse ("#{month} #{year}")
             @volume.save
             @volume.event = @g_event
-          end  
+         else
+           @volume = Volume.find_by_anthology_id vol_id
+            @volume.save
+          end
       end
       else
 	      @paper        = Paper.new
@@ -258,7 +264,4 @@ desc "Loads papers from an xml files without <bibtype> and <bibtitle>"
     end
   end
 end
-
-
-
 end # namespace :anthology
