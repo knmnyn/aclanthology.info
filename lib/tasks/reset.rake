@@ -16,14 +16,21 @@ namespace :anthology do
     Rake::Task['tmp:clear'].invoke
     puts "Restarting Httpd..."
     `sudo service httpd graceful`
-   # puts "Restarting Solr...please wait"
-   # Rake::Task['anthology:solr:start_jetty'].invoke
+    puts "Restarting Solr...please wait"
+    Rake::Task['anthology:solr:start_jetty'].invoke
   end
 
   namespace :solr do
     desc "Drop Solr Indices"
     task :drop => :environment do
-      `/bin/rm -Rf jetty/solr/data`
+      puts "/bin/rm -Rf #{Rails.root}/jetty/solr/data"
+      `/bin/rm -Rf #{Rails.root}/jetty/solr/data`
+    end
+
+    desc "Start Jetty"
+    task :start_jetty => :environment do
+      puts "cd #{Rails.root}/jetty; nohup java -jar start.jar > jetty.log 2>&1 &"
+      `cd #{Rails.root}/jetty; nohup java -jar start.jar > jetty.log 2>&1 &`
     end
   end # namespace :solr
 

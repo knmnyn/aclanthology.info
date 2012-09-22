@@ -1,6 +1,4 @@
 # -*- encoding : utf-8 -*-
-
-
 require 'blacklight/catalog'
 require 'blacklight_advanced_search/parse_basic_q'
 class CatalogController < ApplicationController  
@@ -8,7 +6,6 @@ class CatalogController < ApplicationController
   include BlacklightAdvancedSearch::ParseBasicQ
   include Blacklight::Catalog
   #include BlacklightMoreLikeThis::ControllerExtension
-
 
   configure_blacklight do |config|
     config.default_solr_params = { 

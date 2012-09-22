@@ -2,7 +2,7 @@ namespace :anthology do
   desc "Export papers from database into solr via xml file"
   task :export_to_solr => :environment do
     xml = REXML::Document.new "<?xml version='1.0'?>"
-    post_loc = "../jetty/post.sh"
+    post_loc = "#{Rails.root}/jetty/post.sh"
     require 'tempfile'
     papers = Paper.find(:all)
     add = xml.add_element 'add'
@@ -226,8 +226,6 @@ namespace :anthology do
     file.close
 
     puts `#{post_loc} #{file.path}`
-    # ingest file
-    #`#{post_loc} #{file.path}`
     #file.unlink
   end
 
@@ -327,7 +325,7 @@ namespace :anthology do
   desc "Export papers from database into solr via xml file"
   task :export_volume_to_solr => :environment do
     xml = REXML::Document.new "<?xml version='1.0'?>"
-    post_loc = "../jetty/post.sh"
+    post_loc = "#{Rails.root}/jetty/post.sh"
     require 'tempfile'
 	#Volume.delete_all(:anthology_id => "W00-0700") #index again and remove this 
     volumes = Volume.find(:all)
