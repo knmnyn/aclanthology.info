@@ -22,7 +22,7 @@ gem 'therubyracer'
 gem "blacklight_advanced_search"
 gem "blacklight_range_limit"
 gem "blacklight_more_like_this"
-gem "bundle"
+gem "bundler"
 # Use unicorn as the web server
 # gem 'unicorn'
 
